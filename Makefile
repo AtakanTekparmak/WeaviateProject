@@ -29,11 +29,12 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  1. install        Install dependencies and set up the environment (should be run first)"
-	@echo "  2. docker_setup   Set up and start the Weaviate Docker container (should be run second, before run)"
-	@echo "  3. easyfnc_setup  Clone the AtakanTekparmak/EasyFNC repository and install requirements (should be run third, after install and docker_setup)"
-	@echo "  4. run            Run the main.py script (should be run after install, docker_setup, and easyfnc_setup)"
-	@echo "  5. docker_stop    Stop the Weaviate Docker container (should be run last after run)"
-	@echo "  6. clean          Remove the virtual environment and its contents"
+	@echo "  2. docker_start   Set up and start the Weaviate Docker container (should be run second, before run)"
+	@echo "  3. easyfnc_setup  Clone the AtakanTekparmak/EasyFNC repository and install requirements (should be run third, after install and docker_start)"
+	@echo "  4. run            Run the main.py script (should be run after install, docker_start, and easyfnc_setup)"
+	@echo "  5. run_api        Run the FastAPI app"
+	@echo "  6. docker_stop    Stop the Weaviate Docker container (should be run last after run)"
+	@echo "  7. clean          Remove the virtual environment and its contents"
 
 # Install dependencies and set up the environment
 install:
@@ -53,7 +54,7 @@ clean:
 	rm -rf $(VENV_NAME)
 
 # Set up the Weaviate Docker container
-docker_setup:
+docker_start:
 	@docker container inspect $(CONTAINER_NAME) >/dev/null 2>&1 && \
 		(echo "Restarting Docker container $(CONTAINER_NAME)" && \
 		docker restart $(CONTAINER_NAME)) || \
@@ -76,3 +77,8 @@ easyfnc_setup:
 		. ../$(VENV_NAME)/bin/activate && \
 		$(PIP) install -r requirements.txt
 	@mv $(EASYFNC_REPO_DIR)/$(EASYFNC_SOURCE_DIR) . && rm -rf $(EASYFNC_REPO_DIR)
+
+# Run the FastAPI app
+run_api:
+	. $(VENV_NAME)/bin/activate && \
+	$(PYTHON) src/main.py

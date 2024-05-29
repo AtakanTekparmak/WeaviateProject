@@ -1,2 +1,10 @@
+# Weaviate
 weaviate-client
+
+# Ollama
 ollama
+
+# FastAPI
+fastapi
+pydantic
+uvicorn
