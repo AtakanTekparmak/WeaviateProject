@@ -1,0 +1,12 @@
+[[ollama]]
+OLLAMA_URL="http://localhost:11434"
+OLLAMA_MODEL="llama3:8b-instruct-fp16"
+OLLAMA_EMBED_MODEL="snowflake-arctic-embed:137m"
+
+[[weaviate]]
+PORT=8080
+COLLECTION_NAME="collectione"
+
+[[agent]]
+SYSTEM_PROMPT="""
+"""
