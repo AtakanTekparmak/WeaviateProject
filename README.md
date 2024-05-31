@@ -10,7 +10,6 @@ Only 6 steps are needed to set up a local environment with Ollama and Weaviate. 
 Then, you can use the Makefile to install the required dependencies. The makefile has the following commands:
 - `make install`: Install the required dependencies.
 - `make docker_start`: Set up and start the Weaviate Docker instance.
-- `make easyfnc_setup`: Clone the EasyFNC repository and install requirements.
 - `make run`: Run the script.
 - `make run_api`: Run the FastAPI app.
 - `make docker_stop`: Stop the Weaviate Docker instance.
@@ -19,7 +18,6 @@ Then, you can use the Makefile to install the required dependencies. The makefil
 A typical installation would look like this:
 ```bash
 make install
-make easyfnc_setup
 make docker_start
 ```
 
