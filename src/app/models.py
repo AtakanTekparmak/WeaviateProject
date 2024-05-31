@@ -13,6 +13,14 @@ class Car(Base):
 
     drivers = relationship("Driver", back_populates="car")
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "make": self.make,
+            "model": self.model,
+            "year": self.year,
+        }
+
 class Driver(Base):
     __tablename__ = "drivers"
 
@@ -22,6 +30,14 @@ class Driver(Base):
     car_id = Column(Integer, ForeignKey("cars.id"))
 
     car = relationship("Car", back_populates="drivers")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "license_number": self.license_number,
+            "car_id": self.car_id,
+        }
 
 class CarBase(BaseModel):
     make: str
