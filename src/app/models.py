@@ -1,22 +1,58 @@
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from pydantic import BaseModel
+from app.database import Base
 
-class SubItem(BaseModel):
-    name: str
-    description: str
+class Car(Base):
+    __tablename__ = "cars"
 
-class ItemBase(BaseModel):
-    name: str
-    price: float
+    id = Column(Integer, primary_key=True, index=True)
+    make = Column(String, index=True)
+    model = Column(String, index=True)
+    year = Column(Integer)
 
-class ItemCreate(ItemBase):
-    sub_item: SubItem
+    drivers = relationship("Driver", back_populates="car")
 
-class ItemUpdate(ItemBase):
-    sub_item: SubItem | None = None
+class Driver(Base):
+    __tablename__ = "drivers"
 
-class Item(ItemBase):
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    license_number = Column(String, unique=True, index=True)
+    car_id = Column(Integer, ForeignKey("cars.id"))
+
+    car = relationship("Car", back_populates="drivers")
+
+class CarBase(BaseModel):
+    make: str
+    model: str
+    year: int
+
+class CarCreate(CarBase):
+    pass
+
+class CarUpdate(CarBase):
+    pass
+
+class CarResponse(CarBase):
     id: int
-    sub_item: SubItem
 
     class Config:
         from_attributes = True
+
+class DriverBase(BaseModel):
+    name: str
+    license_number: str
+
+class DriverCreate(DriverBase):
+    car_id: int
+
+class DriverUpdate(DriverBase):
+    car_id: int | None = None
+
+class DriverResponse(DriverBase):
+    id: int
+    car_id: int
+
+    class Config:
+        ofrom_attributes = True

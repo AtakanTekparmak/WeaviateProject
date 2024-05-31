@@ -1,34 +1,27 @@
-from fastapi import FastAPI, Depends
-from . import models, crud
+from fastapi import FastAPI
+from app import models
+from app.crud_router import create_crud_router
+from app.database import create_tables
 
+# Instantiate the FastAPI app
 app = FastAPI()
 
-# Dependency
-def get_db():
-    db = []
-    return db
+# Create tables 
+create_tables()
 
-# Routes
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+car_router = create_crud_router(
+    model=models.Car,
+    create_schema=models.CarCreate,
+    update_schema=models.CarUpdate,
+    response_schema=models.CarResponse,
+)
 
-@app.post("/items/", response_model=models.Item)
-async def create_item(item: models.ItemCreate, db=Depends(get_db)):
-    return crud.create_item(db, item)
+driver_router = create_crud_router(
+    model=models.Driver,
+    create_schema=models.DriverCreate,
+    update_schema=models.DriverUpdate,
+    response_schema=models.DriverResponse,
+)
 
-@app.get("/items/", response_model=list[models.Item])
-async def read_items(db=Depends(get_db)):
-    return crud.get_items(db)
-
-@app.get("/items/{item_id}", response_model=models.Item)
-async def read_item(item_id: int, db=Depends(get_db)):
-    return crud.get_item(db, item_id)
-
-@app.put("/items/{item_id}", response_model=models.Item)
-async def update_item(item_id: int, item: models.ItemUpdate, db=Depends(get_db)):
-    return crud.update_item(db, item_id, item)
-
-@app.delete("/items/{item_id}")
-async def delete_item(item_id: int, db=Depends(get_db)):
-    return crud.delete_item(db, item_id)
+app.include_router(car_router, prefix="/cars", tags=["cars"])
+app.include_router(driver_router, prefix="/drivers", tags=["drivers"])

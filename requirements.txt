@@ -7,6 +7,9 @@ ollama
 # easy_fnc
 easy-fnc==0.1.5
 
+# SqlAlchemy
+sqlalchemy
+
 # FastAPI
 fastapi
 pydantic
