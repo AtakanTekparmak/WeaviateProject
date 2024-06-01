@@ -1,10 +1,11 @@
 from easy_fnc.models.ollama import OllamaModel
 from easy_fnc.function_caller import FunctionCaller
 from easy_fnc.utils import load_template
+import json
 
 # Set constants
 MODEL_NAME = "adrienbrault/nous-hermes2pro-llama3-8b:f16" # using llama3 model for testing
-VERBOSE = False
+VERBOSE = True
 SHOW_FUNCTION_CALLS = True
 
 # Instantiate a FunctionCaller and add user functions
@@ -19,20 +20,35 @@ model = OllamaModel(
     template=load_template("template.json"),
 )
 
+# Load the database schema
+try:
+    with open("schema.json") as f:
+        database_schema = json.load(f)
+except FileNotFoundError:
+    database_schema = {}
+    print("Schema file not found")
+
 # Call the model with a query
-user_query = "Can you add a 2021 Toyota Corolla to the 'cars' table in the database? (Please only add the car and do nothing else)"
+prefix_string = f"The models in the database are like the following (Note, the 'id' field for each model is not needed when creating, but foreign id fields (ex. 'car_id') are needed.) :\n{json.dumps(database_schema, indent=4)}\n\n"
+suffix_string = "\n Note: Think truly about the database schema and the data you are adding. The data should be consistent with the schema and the data already in the database. Look at the relationships and dependencies between the database models."
+
+user_query = "Can you add a driver to the database?"
+#user_query = "Can you add a 2022 Opel Astra to the database?"
 print(f"-User Input: \n{user_query}\n")
-function_calls = model.get_function_calls(user_query, verbose=SHOW_FUNCTION_CALLS)
+function_calls = model.get_function_calls(prefix_string + user_query, verbose=SHOW_FUNCTION_CALLS)
 
 # Call the functions
 output = ""
 for function in function_calls:
     output = function_caller.call_function(function)
     if VERBOSE:
-        print(f"Function Output: {function_caller.call_function(function)}")
+        print(f"Function Output: {output}")
 
 # Call the model with the output
-response = model.generate(output, first_message=False, response_message=True, original_prompt=user_query) if output else "Function output is empty"
+if isinstance(output, int):
+    response = "Sure, created record with ID: " + str(output)
+else:
+    response = model.generate(output, first_message=False, response_message=True, original_prompt=user_query) if output else "Function output is empty"
 
 # Print the response
 print(f"- Model reply: \n{response}")

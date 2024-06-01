@@ -1,0 +1,14 @@
+{
+    "cars": {
+      "make": "type: string",
+      "model": "type: string",
+      "year": "type: integer",
+      "id": "type: integer, required for update, delete and single get"
+    },
+    "drivers": {
+      "name": "type: string",
+      "license_number": "type: string",
+      "id": "type: integer, required for update, delete and single get",
+      "car_id": "type: integer, required for create. Create a car first"
+    }
+}

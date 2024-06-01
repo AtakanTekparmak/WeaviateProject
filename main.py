@@ -1,4 +1,4 @@
-from src.weaviate import Client, DOCUMENTS
+from src.weaviate import Client
 from src.utils import load_config
 
 def main():
