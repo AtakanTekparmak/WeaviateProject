@@ -5,8 +5,5 @@ __pycache__/
 # Virtualenv
 venv/
 
-# easy_fnc
-easy_fnc/
-
 # SqLite database file
 app.db

@@ -4,7 +4,7 @@ from easy_fnc.utils import load_template
 import json
 
 # Set constants
-MODEL_NAME = "adrienbrault/nous-hermes2pro-llama3-8b:f16" # using llama3 model for testing
+MODEL_NAME = "yi:34b-chat-v1.5-q8_0" # using llama3 model for testing
 VERBOSE = True
 SHOW_FUNCTION_CALLS = True
 
