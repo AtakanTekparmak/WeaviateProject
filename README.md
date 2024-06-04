@@ -1,5 +1,9 @@
 # Ollama + Weaviate Local Setup
 
+## What to expect
+
+This project is an Ollama + Streamlit + FastAPI app that allows the user to ask an LLM to perform basic CRUD operations on a FastAPI server given the user's input, the database schemas and the available tools (create, read, update, delete). 
+
 ## Installation
 Only a few steps are needed to set up a local environment with Ollama and Weaviate. The following instructions are for a Unix-based system.
 ### Requirements
