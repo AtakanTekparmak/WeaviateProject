@@ -20,7 +20,7 @@
       "price_paid": "type: number",
       "id": "type: integer, required for update, delete and single get"
     },
-    "maintenancereports": {
+    "maintenance_reports": {
       "car_id": "type: integer, required for create. Create a car first",
       "date": "type: string",
       "time": "type: string",

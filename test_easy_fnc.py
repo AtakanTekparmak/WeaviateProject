@@ -32,7 +32,7 @@ except FileNotFoundError:
 prefix_string = f"The models in the database are like the following (Note, the 'id' field for each model is not needed when creating, but foreign id fields (ex. 'car_id') are needed.) :\n{json.dumps(database_schema, indent=4)}\n\n"
 suffix_string = "\n Note: Think truly about the database schema and the data you are adding. The data should be consistent with the schema and the data already in the database. Look at the relationships and dependencies between the database models."
 
-user_query = "Can you add a driver to the database?"
+user_query = "Can you add a maintenance report to the database?"
 #user_query = "Can you add a 2022 Opel Astra to the database?"
 print(f"-User Input: \n{user_query}\n")
 function_calls = model.get_function_calls(prefix_string + user_query, verbose=SHOW_FUNCTION_CALLS)
