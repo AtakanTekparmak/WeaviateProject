@@ -2,6 +2,7 @@ import ollama
 
 import json
 from typing import Union
+import tomllib
 
 from easy_fnc.models.model import EasyFNCModel
 
@@ -52,29 +53,25 @@ class OllamaModel(EasyFNCModel):
         """
         Generate a response based on the user input.
         """
-        """
-        if first_message:
+        if response_message:
             user_input = self.format_user_input(user_input)
-        elif response_message:
-            user_input = self.format_output(user_input, original_prompt)
-        """
-        # Read examples.toml
-        import tomllib
+            messages = [{"role": "user", "content": user_input}]
+        else:
+            with open("examples.toml", "rb") as f:
+                data = tomllib.load(f)
 
-        with open("examples.toml", "rb") as f:
-            data = tomllib.load(f)
+            # Get the examples and beginning of the prompt
+            examples = data["example"]
+            prompt_beginning = data["PROMPT_BEGINNING"]
 
-        # Get the examples and beginning of the prompt
-        examples = data["example"]
-        prompt_beginning = data["PROMPT_BEGINNING"]
+            # Construct chat
+            messages = [{"role": "system", "content": prompt_beginning}]
+            for example in examples:
+                messages.append({"role": "user", "content": example["USER_QUERY"]})
+                messages.append({"role": "assistant", "content": example["ASSISTANT_REPLY"]})
 
-        # Construct chat
-        messages = [{"role": "system", "content": prompt_beginning}]
-        for example in examples:
-            messages.append({"role": "user", "content": example["USER_QUERY"]})
-            messages.append({"role": "assistant", "content": example["ASSISTANT_REPLY"]})
+            messages.append({"role": "user", "content": user_input})
 
-        messages.append({"role": "user", "content": user_input})
         # Get the model response and extract the content
         model_response = ollama.chat(
             model=self.model_name,
