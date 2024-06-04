@@ -67,7 +67,7 @@ def streamlit_generate(
     SHOW_FUNCTION_CALLS = True
     #user_query = "Can you add a maintenance report to the database?"
 
-    function_calls = model.get_function_calls(prefix_string + user_query + suffix_string, verbose=SHOW_FUNCTION_CALLS)
+    function_calls = model.get_function_calls(prefix_string + user_query, verbose=SHOW_FUNCTION_CALLS)
 
     # Call the functions
     output = ""
@@ -76,7 +76,8 @@ def streamlit_generate(
         if VERBOSE:
             print(f"Function Output: {output}\n")
     
-    st.session_state.messages.append({"role": "assistant", "content": "Function calls:\n" + function_calls})
+    st.session_state.messages.append({"role": "assistant", "content": function_calls})
+    st.chat_message("assistant").write("Function calls: ")
     st.chat_message("assistant").write(function_calls)
 
     # Call the model with the output
