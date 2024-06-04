@@ -26,9 +26,25 @@ driver_router = create_crud_router(
     response_schema=models.DriverResponse,
 )
 
+maintenance_report_router = create_crud_router(
+    model=models.MaintenanceReport,
+    create_schema=models.MaintenanceReportCreate,
+    update_schema=models.MaintenanceReportUpdate,
+    response_schema=models.MaintenanceReportResponse,
+)
+
+insurance_router = create_crud_router(
+    model=models.Insurance,
+    create_schema=models.InsuranceCreate,
+    update_schema=models.InsuranceUpdate,
+    response_schema=models.InsuranceResponse,
+)
+
 # Include the routers
 app.include_router(car_router, prefix="/cars", tags=["cars"])
 app.include_router(driver_router, prefix="/drivers", tags=["drivers"])
+app.include_router(maintenance_report_router, prefix="/maintenance_reports", tags=["maintenance_reports"])
+app.include_router(insurance_router, prefix="/insurances", tags=["insurances"])
 
 # Create a route to get the OpenAPI schema
 @app.get("/docs_info")

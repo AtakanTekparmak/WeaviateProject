@@ -10,5 +10,22 @@
       "license_number": "type: string",
       "id": "type: integer, required for update, delete and single get",
       "car_id": "type: integer, required for create. Create a car first"
+    },
+    "insurances": {
+      "car_id": "type: integer, required for create. Create a car first",
+      "driver_id": "type: integer, required for create. Create a driver first",
+      "insurer": "type: string",
+      "begin_date": "type: string",
+      "end_date": "type: string",
+      "price_paid": "type: number",
+      "id": "type: integer, required for update, delete and single get"
+    },
+    "maintenancereports": {
+      "car_id": "type: integer, required for create. Create a car first",
+      "date": "type: string",
+      "time": "type: string",
+      "report": "type: string",
+      "price_paid": "type: number",
+      "id": "type: integer, required for update, delete and single get"
     }
 }
