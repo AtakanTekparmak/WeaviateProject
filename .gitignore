@@ -7,3 +7,7 @@ venv/
 
 # SqLite database file
 app.db
+
+# Specific stuff
+user_input.txt
+test_easy_fnc.py
