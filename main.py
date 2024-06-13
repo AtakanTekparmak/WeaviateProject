@@ -2,7 +2,7 @@ from src.weaviate import Client
 from src.utils import load_config
 
 from easy_fnc.models.ollama import OllamaModel
-from easy_fnc.function_caller import FunctionCaller
+from easy_fnc.function_caller import FunctionCallingEngine, create_functions_metadata
 from easy_fnc.utils import load_template
 
 import streamlit as st
@@ -24,15 +24,15 @@ def weaviate_main():
     # Close the Weaviate client
     client.close()
 
-def setup() -> tuple[OllamaModel, FunctionCaller, str, str]:
+def setup() -> tuple[OllamaModel, FunctionCallingEngine, str, str]:
     # Set constants
     #MODEL_NAME = "yi:34b-chat-v1.5-q8_0" # using llama3 model for testing
     MODEL_NAME = "adrienbrault/nous-hermes2pro-llama3-8b:f16"
 
     # Instantiate a FunctionCaller and add user functions
-    function_caller = FunctionCaller()
+    function_caller = FunctionCallingEngine()
     function_caller.add_user_functions("functions.py")
-    functions_metadata = function_caller.create_functions_metadata()
+    functions_metadata = create_functions_metadata(function_caller.functions)
 
     # Create a model
     model = OllamaModel(
@@ -58,7 +58,7 @@ def setup() -> tuple[OllamaModel, FunctionCaller, str, str]:
 def streamlit_generate(
         user_query: str,
         model: OllamaModel,
-        function_caller: FunctionCaller,
+        function_caller: FunctionCallingEngine,
         prefix_string: str,
         suffix_string: str
     ) -> str:
@@ -67,14 +67,20 @@ def streamlit_generate(
     SHOW_FUNCTION_CALLS = True
     #user_query = "Can you add a maintenance report to the database?"
 
-    function_calls = model.get_function_calls(prefix_string + user_query, verbose=SHOW_FUNCTION_CALLS)
+    #function_calls = model.get_function_calls(prefix_string + user_query, verbose=SHOW_FUNCTION_CALLS)
+    model_response_raw = model.generate(prefix_string + user_query, first_message=True, response_message=False)
+    # If there's anything after "<|end_function_calls|>", remove it
+    if "<|end_function_calls|>" in model_response_raw:
+        model_response_raw = model_response_raw.split("<|end_function_calls|>")[0] + "<|end_function_calls|>"
+
+    if VERBOSE:
+        print(f"Model response\n {model_response_raw}")
+        
+    model_response = function_caller.parse_model_response(model_response_raw)
 
     # Call the functions
-    output = ""
-    for function in function_calls:
-        output = function_caller.call_function(function)
-        if VERBOSE:
-            print(f"Function Output: {output}\n")
+    function_calls = model_response.function_calls
+    output = function_caller.call_functions(function_calls)
     
     st.session_state.messages.append({"role": "assistant", "content": function_calls})
     st.chat_message("assistant").write("Function calls: ")

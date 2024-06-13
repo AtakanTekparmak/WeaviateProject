@@ -27,7 +27,7 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
         },
         "returns": [
             {
-                "name": "map_func_to_list_output",
+                "name": "map_func_to_list_returns",
                 "type": "list[any]"
             }
         ]
@@ -53,7 +53,7 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
         },
         "returns": [
             {
-                "name": "get_val_from_dict_output",
+                "name": "get_val_from_dict_returns",
                 "type": "<built-in function any>"
             }
         ]
@@ -74,7 +74,7 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
         },
         "returns": [
             {
-                "name": "concatenate_strings_output",
+                "name": "concatenate_strings_returns",
                 "type": "str"
             }
         ]
@@ -95,7 +95,7 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
         },
         "returns": [
             {
-                "name": "_mean_output",
+                "name": "_mean_returns",
                 "type": "float"
             }
         ]
@@ -121,7 +121,7 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
         },
         "returns": [
             {
-                "name": "create_record_output",
+                "name": "create_record_returns",
                 "type": "int"
             }
         ]
@@ -142,7 +142,7 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
         },
         "returns": [
             {
-                "name": "read_records_output",
+                "name": "read_records_returns",
                 "type": "typing.List[typing.Dict[str, typing.Union[str, int]]]"
             }
         ]
@@ -173,7 +173,7 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
         },
         "returns": [
             {
-                "name": "update_record_output",
+                "name": "update_record_returns",
                 "type": "typing.Dict[str, typing.Union[str, int]]"
             }
         ]
@@ -199,7 +199,7 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
         },
         "returns": [
             {
-                "name": "delete_record_output",
+                "name": "delete_record_returns",
                 "type": "typing.Dict[str, str]"
             }
         ]
@@ -209,11 +209,11 @@ You are an AI assistant that can help the user with a variety of tasks. Your mai
  When the user asks you a question, if you need to use functions, provide ONLY ALL OF THE function calls, ALL IN ONE PLACE, in the format:
 <|function_calls|>
 [
-{ "name": "function_name", "params": {"kwarg_1": "value_1", "kwarg_2": "value_2"}, "output": "output_1"},
-{ "name": "other_function_name", "params": { "kwarg_3": "$output_1$"}, "output": "output_2"},
-...
+    { "name": "function_name", "kwargs": {"kwarg_1": "value_1", "kwarg_2": "value_2"}, "returns": ["returns_1"]},
+    { "name": "other_function_name", "kwargs": { "kwarg_3": "returns_1"}, "returns": ["returns_2", "returns_3"]}
+    ...
 ]
-<|end_function_calls|> 
+<|end_function_calls|>
 
  IF AND ONLY IF you don't need to use functions, give your answer in between <|answer|> and <|end_answer|> blocks. For your thoughts and reasoning behind using or not using functions, place ALL OF THEM in between a SINGLE <|thoughts|> and <|end_thoughts|> block, before the <|function_calls|> and <|end_function_calls|> tags, like so: 
 
@@ -223,6 +223,7 @@ The user wants X, to do that, I should call the following functions:
 2. function_name_2: Reasoning2,
 3. etc.
 <|end_thoughts|> 
+
  Provide nothing else than the information in the <|function_calls|> & <|end_function_calls|>, <|answer|> & <|end_answer|> and <|thoughts|> & <|end_thoughts|> blocks.
  <|user_query|>The models in the database are like the following (Note, the 'id' field for each model is not needed when creating, but foreign id fields (ex. 'car_id') are needed.) :
 {
@@ -243,6 +244,20 @@ The user wants X, to do that, I should call the following functions:
 """
 
 [[example]]
+USER_QUERY = "Can you add a car to the database?<|end_user_query|><|end|>"
+ASSISTANT_REPLY = """
+<|thoughts|>
+The user wants to add a car to the database. To do this, I need to call the "create_record" function with the table name "cars" and the necessary data for a car.
+<|end_thoughts|>
+
+<|function_calls|>
+[
+    { "name": "create_record", "kwargs": {"table_name": "cars", "data": { "make": "Toyota", "model": "Corolla", "year": 2020}}, "returns": "car_id"}
+]
+<|end_function_calls|>
+"""
+
+[[example]]
 USER_QUERY = "Can you add a driver to the database?<|end_user_query|><|end|>"
 ASSISTANT_REPLY = """
 <|thoughts|>
@@ -251,8 +266,8 @@ The user wants to add a driver to the database. To do this, I need to call the "
 
 <|function_calls|>
 [
-    { "name": "create_record", "params": {"table_name": "cars", "data": { "make": "Toyota", "model": "Corolla", "year": 2020}}, "output": "car_id"},
-    { "name": "create_record", "params": { "table_name": "drivers", "data": { "name": "John Doe", "license_number": "123456789", "car_id": "$car_id$"}}, "output": "driver_id"}
+    { "name": "create_record", "kwargs": {"table_name": "cars", "data": { "make": "Toyota", "model": "Corolla", "year": 2020}}, "returns": "car_id"},
+    { "name": "create_record", "kwargs": { "table_name": "drivers", "data": { "name": "John Doe", "license_number": "123456789", "car_id": "car_id"}}, "returns": "driver_id"}
 ]
 <|end_function_calls|>
 """
@@ -269,9 +284,9 @@ To populate the database with 2 cars, I need to create 2 records in the 'cars' t
 
 <|function_calls|>
 [
-    { "name": "create_record", "params": {"table_name": "cars", "data": {"make": "Toyota", "model": "Corolla", "year": 2020}}, "output": "car_id_1"},
-    { "name": "create_record", "params": {"table_name": "cars", "data": {"make": "Honda", "model": "Civic", "year": 2021}}, "output": "car_id_2"},
-    { "name": "read_records", "params": {"table_name": "cars"}, "output": "cars_data"}
+    { "name": "create_record", "kwargs": {"table_name": "cars", "data": {"make": "Toyota", "model": "Corolla", "year": 2020}}, "returns": "car_id_1"},
+    { "name": "create_record", "kwargs": {"table_name": "cars", "data": {"make": "Honda", "model": "Civic", "year": 2021}}, "returns": "car_id_2"}
+    { "name": "read_records", "kwargs": {"table_name": "cars"}, "returns": "cars_data"}
 ]
 <|end_function_calls|>
 """
@@ -285,8 +300,8 @@ To add a 2022 Chevrolet Corvette to the database, we need to first create a car 
 
 <|function_calls|>
 [
-    { "name": "create_record", "params": { "table_name": "cars", "data": { "make": "Chevrolet", "model": "Corvette", "year": 2022}},"output": "car_id"},
-    { "name": "update_record", "params": { "table_name": "cars", "record_id": "$car_id$", "data": { "year": 2021}}, "output": "updated_car"}
+    { "name": "create_record", "kwargs": { "table_name": "cars", "data": { "make": "Chevrolet", "model": "Corvette", "year": 2022}},"returns": "car_id"},
+    { "name": "update_record", "kwargs": { "table_name": "cars", "record_id": "car_id", "data": { "year": 2021}}, "returns": "updated_car"}
 ]
 <|end_function_calls|>
 """
@@ -310,12 +325,12 @@ For the "drivers" table:
 
 <|function_calls|>
 [
-    { "name": "create_record", "params": {"table_name": "cars", "data": {"make": "Toyota", "model": "Corolla", "year": 2005}}, "output": "car_id_1"},
-    { "name": "create_record", "params": {"table_name": "cars", "data": {"make": "Honda", "model": "Civic", "year": 2010}}, "output": "car_id_2"},
-    { "name": "create_record", "params": {"table_name": "cars", "data": {"make": "Ford", "model": "Focus", "year": 2015}}, "output": "car_id_3"},
-    { "name": "create_record", "params": {"table_name": "drivers", "data": {"name": "Alice", "license_number": "AL1234", "car_id": "$car_id_1"}}, "output": "driver_id_1"},
-    { "name": "create_record", "params": {"table_name": "drivers", "data": {"name": "Bob", "license_number": "BO5678", "car_id": "$car_id_2"}}, "output": "driver_id_2"},
-    { "name": "create_record", "params": {"table_name": "drivers", "data": {"name": "Charlie", "license_number": "CH9012", "car_id": "$car_id_3"}}, "output": "driver_id_3"},
+    { "name": "create_record", "kwargs": {"table_name": "cars", "data": {"make": "Toyota", "model": "Corolla", "year": 2005}}, "returns": "car_id_1"},
+    { "name": "create_record", "kwargs": {"table_name": "cars", "data": {"make": "Honda", "model": "Civic", "year": 2010}}, "returns": "car_id_2"},
+    { "name": "create_record", "kwargs": {"table_name": "cars", "data": {"make": "Ford", "model": "Focus", "year": 2015}}, "returns": "car_id_3"},
+    { "name": "create_record", "kwargs": {"table_name": "drivers", "data": {"name": "Alice", "license_number": "AL1234", "car_id": "car_id_1"}}, "returns": "driver_id_1"},
+    { "name": "create_record", "kwargs": {"table_name": "drivers", "data": {"name": "Bob", "license_number": "BO5678", "car_id": "car_id_2"}}, "returns": "driver_id_2"},
+    { "name": "create_record", "kwargs": {"table_name": "drivers", "data": {"name": "Charlie", "license_number": "CH9012", "car_id": "car_id_3"}}, "returns": "driver_id_3"}
 ]
 
 <|end_function_calls|>
